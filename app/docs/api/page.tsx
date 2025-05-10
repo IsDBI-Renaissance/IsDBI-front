@@ -44,34 +44,28 @@ type EndpointGroup = {
 // Sample API data
 const apiEndpoints: EndpointGroup[] = [
   {
-    id: "shipments",
-    name: "Shipments",
-    description: "Endpoints for managing shipments",
+    id: "use-cases",
+    name: "Use Case Scenario Analysis",
+    description: "Endpoints for analyzing use case scenarios and providing accounting guidance based on AAOIFI standards",
     endpoints: [
       {
-        id: "get-shipments",
-        path: "/v1/shipments",
-        method: "GET",
-        summary: "List all shipments",
-        description: "Returns a list of all shipments with pagination support.",
+        id: "analyze-use-case",
+        path: "/service1",
+        method: "POST",
+        summary: "Analyze use case scenario",
+        description: "Analyzes a use case scenario and provides accounting guidance based on AAOIFI standards.",
         parameters: [
           {
-            name: "page",
-            type: "integer",
-            required: false,
-            description: "Page number for pagination (default: 1)",
-          },
-          {
-            name: "limit",
-            type: "integer",
-            required: false,
-            description: "Number of items per page (default: 20, max: 100)",
-          },
-          {
-            name: "status",
+            name: "text",
             type: "string",
+            required: true,
+            description: "The use case scenario description",
+          },
+          {
+            name: "file",
+            type: "file",
             required: false,
-            description: "Filter by shipment status (pending, in_transit, delivered, cancelled)",
+            description: "Supporting document (PDF, DOCX, XLSX)",
           },
         ],
         responses: [
@@ -79,56 +73,60 @@ const apiEndpoints: EndpointGroup[] = [
             status: 200,
             description: "Successful response",
             example: `{
-  "data": [
+  "analysis": "Detailed analysis of the use case",
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "standards": ["FAS 1", "FAS 2"],
+  "journal_entries": [
     {
-      "id": "ship_123456",
-      "origin": "Shanghai, China",
-      "destination": "Rotterdam, Netherlands",
-      "status": "in_transit",
-      "estimated_arrival": "2023-06-15T14:00:00Z",
-      "created_at": "2023-05-01T09:30:00Z"
-    },
-    {
-      "id": "ship_123457",
-      "origin": "Los Angeles, USA",
-      "destination": "Tokyo, Japan",
-      "status": "pending",
-      "estimated_arrival": "2023-07-10T10:00:00Z",
-      "created_at": "2023-05-02T11:45:00Z"
+      "account": "Account Name",
+      "debit": 1000,
+      "credit": 0
     }
   ],
-  "meta": {
-    "current_page": 1,
-    "total_pages": 5,
-    "total_count": 42
-  }
+  "implementation_steps": [
+    {
+      "step": 1,
+      "description": "Step description",
+      "standard_reference": "FAS 1"
+    }
+  ]
 }`,
           },
           {
             status: 401,
             description: "Unauthorized",
             example: `{
-  "error": {
-    "code": "unauthorized",
-    "message": "API key is missing or invalid"
-  }
+  "message": "Your session has expired. Please log in again."
 }`,
           },
         ],
         requiresAuth: true,
       },
+    ],
+  },
+  {
+    id: "reverse-transactions",
+    name: "Reverse Transaction Analysis",
+    description: "Endpoints for analyzing journal entries to identify transaction types and applicable standards",
+    endpoints: [
       {
-        id: "get-shipment",
-        path: "/v1/shipments/{id}",
-        method: "GET",
-        summary: "Get a specific shipment",
-        description: "Returns detailed information about a specific shipment.",
+        id: "analyze-transaction",
+        path: "/service2",
+        method: "POST",
+        summary: "Analyze journal entries",
+        description: "Analyzes journal entries to identify the underlying transaction type and applicable AAOIFI standards.",
         parameters: [
           {
-            name: "id",
-            type: "string",
+            name: "entries",
+            type: "array",
             required: true,
-            description: "The shipment ID",
+            description: "Array of journal entries to analyze",
+          },
+          {
+            name: "description",
+            type: "string",
+            required: false,
+            description: "Optional description of the transaction",
           },
         ],
         responses: [
@@ -136,138 +134,26 @@ const apiEndpoints: EndpointGroup[] = [
             status: 200,
             description: "Successful response",
             example: `{
-  "id": "ship_123456",
-  "origin": {
-    "address": "123 Export St",
-    "city": "Shanghai",
-    "country": "China",
-    "postal_code": "200000"
-  },
-  "destination": {
-    "address": "456 Import Ave",
-    "city": "Rotterdam",
-    "country": "Netherlands",
-    "postal_code": "3000 AB"
-  },
-  "status": "in_transit",
-  "estimated_arrival": "2023-06-15T14:00:00Z",
-  "actual_departure": "2023-05-05T08:30:00Z",
-  "carrier": {
-    "id": "carr_789",
-    "name": "OceanFreight Express"
-  },
-  "tracking": {
-    "number": "OFE123456789",
-    "url": "https://track.oceanfreight.example/OFE123456789"
-  },
-  "items": [
-    {
-      "description": "Electronics",
-      "quantity": 50,
-      "weight_kg": 500,
-      "value_usd": 25000
-    }
-  ],
-  "created_at": "2023-05-01T09:30:00Z",
-  "updated_at": "2023-05-05T08:35:00Z"
-}`,
-          },
-          {
-            status: 404,
-            description: "Not Found",
-            example: `{
-  "error": {
-    "code": "not_found",
-    "message": "Shipment not found"
+  "transaction_type": "Identified transaction type",
+  "confidence_score": 0.95,
+  "applicable_standards": ["FAS 1", "FAS 2"],
+  "analysis": "Detailed analysis of the transaction",
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "standard_compliance": {
+    "compliant": true,
+    "issues": [],
+    "suggestions": []
   }
-}`,
-          },
-        ],
-        requiresAuth: true,
-      },
-      {
-        id: "create-shipment",
-        path: "/v1/shipments",
-        method: "POST",
-        summary: "Create a new shipment",
-        description: "Creates a new shipment with the provided details.",
-        parameters: [
-          {
-            name: "origin",
-            type: "object",
-            required: true,
-            description: "Origin address details",
-          },
-          {
-            name: "destination",
-            type: "object",
-            required: true,
-            description: "Destination address details",
-          },
-          {
-            name: "items",
-            type: "array",
-            required: true,
-            description: "Array of items in the shipment",
-          },
-          {
-            name: "carrier_id",
-            type: "string",
-            required: false,
-            description: "Preferred carrier ID",
-          },
-        ],
-        responses: [
-          {
-            status: 201,
-            description: "Created",
-            example: `{
-  "id": "ship_123458",
-  "origin": {
-    "address": "789 Sender St",
-    "city": "New York",
-    "country": "USA",
-    "postal_code": "10001"
-  },
-  "destination": {
-    "address": "101 Receiver Rd",
-    "city": "London",
-    "country": "UK",
-    "postal_code": "EC1A 1BB"
-  },
-  "status": "pending",
-  "estimated_arrival": "2023-07-20T12:00:00Z",
-  "carrier": {
-    "id": "carr_456",
-    "name": "TransAtlantic Shipping"
-  },
-  "tracking": {
-    "number": "TAS987654321",
-    "url": "https://track.transatlantic.example/TAS987654321"
-  },
-  "items": [
-    {
-      "description": "Furniture",
-      "quantity": 10,
-      "weight_kg": 300,
-      "value_usd": 15000
-    }
-  ],
-  "created_at": "2023-05-10T14:25:00Z",
-  "updated_at": "2023-05-10T14:25:00Z"
 }`,
           },
           {
             status: 400,
             description: "Bad Request",
             example: `{
-  "error": {
-    "code": "invalid_request",
-    "message": "Invalid request parameters",
-    "details": {
-      "origin": ["Origin address is required"],
-      "items": ["At least one item is required"]
-    }
+  "message": "Invalid request format or missing required fields",
+  "details": {
+    "field": "entries",
+    "error": "At least one journal entry is required"
   }
 }`,
           },
@@ -277,95 +163,28 @@ const apiEndpoints: EndpointGroup[] = [
     ],
   },
   {
-    id: "routes",
-    name: "Routes",
-    description: "Endpoints for managing and optimizing routes",
+    id: "standards",
+    name: "Standards Enhancement Analysis",
+    description: "Endpoints for analyzing standards-related queries and providing guidance on enhancements",
     endpoints: [
       {
-        id: "get-routes",
-        path: "/v1/routes",
-        method: "GET",
-        summary: "List all routes",
-        description: "Returns a list of all defined routes with pagination support.",
-        parameters: [
-          {
-            name: "page",
-            type: "integer",
-            required: false,
-            description: "Page number for pagination (default: 1)",
-          },
-          {
-            name: "limit",
-            type: "integer",
-            required: false,
-            description: "Number of items per page (default: 20, max: 100)",
-          },
-        ],
-        responses: [
-          {
-            status: 200,
-            description: "Successful response",
-            example: `{
-  "data": [
-    {
-      "id": "route_123",
-      "name": "Shanghai to Rotterdam",
-      "origin": "Shanghai, China",
-      "destination": "Rotterdam, Netherlands",
-      "distance_km": 19200,
-      "typical_duration_days": 35,
-      "created_at": "2023-01-15T10:30:00Z"
-    },
-    {
-      "id": "route_124",
-      "name": "Los Angeles to Tokyo",
-      "origin": "Los Angeles, USA",
-      "destination": "Tokyo, Japan",
-      "distance_km": 8800,
-      "typical_duration_days": 18,
-      "created_at": "2023-01-20T14:45:00Z"
-    }
-  ],
-  "meta": {
-    "current_page": 1,
-    "total_pages": 3,
-    "total_count": 24
-  }
-}`,
-          },
-        ],
-        requiresAuth: true,
-      },
-      {
-        id: "optimize-routes",
-        path: "/v1/routes/optimize",
+        id: "analyze-standards",
+        path: "/service3",
         method: "POST",
-        summary: "Optimize routes",
-        description: "Optimizes routes based on provided parameters and constraints.",
+        summary: "Analyze standards query",
+        description: "Analyzes standards-related queries and provides guidance on AAOIFI standards enhancements.",
         parameters: [
           {
-            name: "origin",
+            name: "text",
             type: "string",
             required: true,
-            description: "Origin location",
+            description: "The standards-related query",
           },
           {
-            name: "destination",
-            type: "string",
-            required: true,
-            description: "Destination location",
-          },
-          {
-            name: "optimization_criteria",
-            type: "string",
+            name: "file",
+            type: "file",
             required: false,
-            description: "Criteria for optimization (time, cost, emissions)",
-          },
-          {
-            name: "constraints",
-            type: "object",
-            required: false,
-            description: "Additional constraints for route optimization",
+            description: "Supporting document (PDF, DOCX, XLSX)",
           },
         ],
         responses: [
@@ -373,52 +192,17 @@ const apiEndpoints: EndpointGroup[] = [
             status: 200,
             description: "Successful response",
             example: `{
-  "optimized_routes": [
+  "analysis": "Detailed analysis of the standards query",
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "applicable_standards": ["FAS 1", "FAS 2"],
+  "implementation_guidance": "Guidance on implementing the standards",
+  "standard_updates": [
     {
-      "id": "opt_route_1",
-      "origin": "Shanghai, China",
-      "destination": "Rotterdam, Netherlands",
-      "via": ["Suez Canal"],
-      "distance_km": 19200,
-      "estimated_duration_days": 35,
-      "estimated_cost_usd": 15000,
-      "estimated_emissions_co2_tons": 120,
-      "carrier_options": [
-        {
-          "carrier_id": "carr_789",
-          "name": "OceanFreight Express",
-          "price_usd": 15000,
-          "transit_time_days": 35
-        },
-        {
-          "carrier_id": "carr_456",
-          "name": "TransAtlantic Shipping",
-          "price_usd": 16500,
-          "transit_time_days": 33
-        }
-      ]
-    },
-    {
-      "id": "opt_route_2",
-      "origin": "Shanghai, China",
-      "destination": "Rotterdam, Netherlands",
-      "via": ["Cape of Good Hope"],
-      "distance_km": 24000,
-      "estimated_duration_days": 45,
-      "estimated_cost_usd": 13500,
-      "estimated_emissions_co2_tons": 150,
-      "carrier_options": [
-        {
-          "carrier_id": "carr_789",
-          "name": "OceanFreight Express",
-          "price_usd": 13500,
-          "transit_time_days": 45
-        }
-      ]
+      "standard": "FAS 1",
+      "update_type": "Clarification",
+      "description": "Description of the update"
     }
-  ],
-  "optimization_criteria": "cost",
-  "recommended_route_id": "opt_route_2"
+  ]
 }`,
           },
         ],
@@ -427,34 +211,28 @@ const apiEndpoints: EndpointGroup[] = [
     ],
   },
   {
-    id: "analytics",
-    name: "Analytics",
-    description: "Endpoints for retrieving analytics and reports",
+    id: "finfraud",
+    name: "FinFraud Shield Analysis",
+    description: "Endpoints for analyzing financial fraud scenarios and providing risk assessment",
     endpoints: [
       {
-        id: "get-analytics",
-        path: "/v1/analytics/shipments",
-        method: "GET",
-        summary: "Get shipment analytics",
-        description: "Returns analytics data for shipments within a specified time period.",
+        id: "analyze-fraud",
+        path: "/service4",
+        method: "POST",
+        summary: "Analyze fraud scenario",
+        description: "Analyzes financial fraud scenarios and provides risk assessment based on AAOIFI standards.",
         parameters: [
           {
-            name: "start_date",
-            type: "string (ISO date)",
-            required: true,
-            description: "Start date for analytics period (YYYY-MM-DD)",
-          },
-          {
-            name: "end_date",
-            type: "string (ISO date)",
-            required: true,
-            description: "End date for analytics period (YYYY-MM-DD)",
-          },
-          {
-            name: "group_by",
+            name: "text",
             type: "string",
+            required: true,
+            description: "The fraud scenario description",
+          },
+          {
+            name: "file",
+            type: "file",
             required: false,
-            description: "Group results by (day, week, month, carrier, route)",
+            description: "Supporting document (PDF, DOCX, XLSX)",
           },
         ],
         responses: [
@@ -462,48 +240,18 @@ const apiEndpoints: EndpointGroup[] = [
             status: 200,
             description: "Successful response",
             example: `{
-  "period": {
-    "start_date": "2023-01-01",
-    "end_date": "2023-03-31"
-  },
-  "group_by": "month",
-  "data": [
+  "risk_assessment": "Detailed risk assessment",
+  "risk_level": "HIGH",
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "applicable_standards": ["FAS 1", "FAS 2"],
+  "mitigation_strategies": ["Strategy 1", "Strategy 2"],
+  "compliance_issues": [
     {
-      "period": "2023-01",
-      "total_shipments": 120,
-      "completed_shipments": 115,
-      "delayed_shipments": 5,
-      "average_transit_time_days": 32.5,
-      "total_cost_usd": 1850000,
-      "total_emissions_co2_tons": 14500
-    },
-    {
-      "period": "2023-02",
-      "total_shipments": 135,
-      "completed_shipments": 128,
-      "delayed_shipments": 7,
-      "average_transit_time_days": 31.8,
-      "total_cost_usd": 2025000,
-      "total_emissions_co2_tons": 16200
-    },
-    {
-      "period": "2023-03",
-      "total_shipments": 142,
-      "completed_shipments": 130,
-      "delayed_shipments": 12,
-      "average_transit_time_days": 33.2,
-      "total_cost_usd": 2130000,
-      "total_emissions_co2_tons": 17040
+      "standard": "FAS 1",
+      "issue": "Description of the compliance issue",
+      "severity": "HIGH"
     }
-  ],
-  "summary": {
-    "total_shipments": 397,
-    "completed_shipments": 373,
-    "delayed_shipments": 24,
-    "average_transit_time_days": 32.5,
-    "total_cost_usd": 6005000,
-    "total_emissions_co2_tons": 47740
-  }
+  ]
 }`,
           },
         ],
@@ -657,18 +405,17 @@ export default function ApiDocumentation() {
             <div className="mb-8">
               <h2 className="text-xl font-bold text-dark dark:text-white mb-4">Authentication</h2>
               <p className="mb-4 dark:text-gray-300">
-                All API requests require authentication using an API key. You can obtain an API key from your account
-                dashboard.
+                All API requests require authentication using a JWT token. The token should be included in the Authorization header.
               </p>
 
               <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium dark:text-white">API Key</h3>
+                  <h3 className="font-medium dark:text-white">JWT Token</h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="text-neutral hover:text-primary transition-colors"
-                    onClick={() => copyToClipboard("Authorization: Bearer YOUR_API_KEY")}
+                    onClick={() => copyToClipboard("Authorization: Bearer YOUR_JWT_TOKEN")}
                   >
                     <Copy className="w-4 h-4 mr-2" />
                     Copy
@@ -679,7 +426,7 @@ export default function ApiDocumentation() {
                     type="text"
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter your API key"
+                    placeholder="Enter your JWT token"
                     className="flex-1 p-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-l-md focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                   <Button className="rounded-l-none">
@@ -689,12 +436,13 @@ export default function ApiDocumentation() {
                 </div>
                 <pre className="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded-md overflow-x-auto">
                   <code className="dark:text-gray-300">
-                    {`// Example request with API key
-fetch('https://api.FinStandAI.com/v1/shipments', {
+                    {`// Example request with JWT token
+fetch('http://localhost:3000/gateway/service1', {
   headers: {
-    'Authorization': 'Bearer ${apiKey || "YOUR_API_KEY"}',
-    'Content-Type': 'application/json'
-  }
+    'Authorization': 'Bearer ${apiKey || "YOUR_JWT_TOKEN"}',
+    'Content-Type': 'multipart/form-data'
+  },
+  body: formData
 })`}
                   </code>
                 </pre>
@@ -981,9 +729,13 @@ fetch('https://api.FinStandAI.com/v1/shipments', {
             <div className="mb-8">
               <h2 className="text-xl font-bold text-dark dark:text-white mb-4">Rate Limits</h2>
               <p className="dark:text-gray-300">
-                The API is rate limited to 100 requests per minute per API key. If you exceed this limit, you will
-                receive a 429 Too Many Requests response.
+                The API is rate limited to 100 requests per hour per user. Rate limit headers are included in the response:
               </p>
+              <ul className="list-disc list-inside mt-2 dark:text-gray-300">
+                <li>X-RateLimit-Limit: Maximum requests per hour</li>
+                <li>X-RateLimit-Remaining: Remaining requests in the current hour</li>
+                <li>X-RateLimit-Reset: Time when the rate limit resets (Unix timestamp)</li>
+              </ul>
             </div>
 
             <div className="mb-8">
@@ -1011,8 +763,8 @@ fetch('https://api.FinStandAI.com/v1/shipments', {
               <h2 className="text-xl font-bold text-dark dark:text-white mb-4">Support</h2>
               <p className="dark:text-gray-300">
                 If you have any questions or need assistance with the API, please contact our support team at{" "}
-                <a href="mailto:api-support@FinStandAI.com" className="text-primary">
-                  api-support@FinStandAI.com
+                <a href="mailto:support@mizanex.com" className="text-primary">
+                  support@mizanex.com
                 </a>
                 .
               </p>

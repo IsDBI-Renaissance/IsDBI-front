@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
@@ -9,52 +10,51 @@ interface StandardProbability {
   reason: string
 }
 
-interface ReverseEngineeringResponse {
-  most_likely_standard: string
-  standard_probabilities: StandardProbability[]
-  key_features: string[]
-  detailed_explanation: string
-}
-
 interface ReverseEngineeringResponseProps {
-  response: ReverseEngineeringResponse
-  className?: string
+  response: {
+    most_likely_standard: string
+    standard_probabilities: StandardProbability[]
+    key_features?: string[]
+    detailed_explanation?: string
+    timestamp?: string
+  }
 }
 
-export function ReverseEngineeringResponse({ response, className }: ReverseEngineeringResponseProps) {
+export function ReverseEngineeringResponse({ response }: ReverseEngineeringResponseProps) {
+  if (!response) return null
+
+  const {
+    most_likely_standard,
+    standard_probabilities,
+    key_features,
+    detailed_explanation,
+    timestamp,
+  } = response
+
   return (
-    <motion.div
-      className={cn("w-full space-y-6 p-6 bg-white dark:bg-dark-accent rounded-lg shadow-sm", className)}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* Primary Standard */}
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium text-neutral dark:text-gray-400">Most Likely Standard</h3>
-        <div className="text-xl font-semibold text-primary dark:text-primary-light">
-          {response.most_likely_standard}
-        </div>
+    <div className="bg-white dark:bg-dark-accent rounded-xl shadow p-6 border border-gray-100 dark:border-gray-800 max-w-md mx-auto">
+      <div className="mb-4">
+        <div className="text-sm text-neutral font-medium mb-1">Most Likely Standard</div>
+        <div className="text-2xl font-bold text-primary mb-2">{most_likely_standard}</div>
       </div>
 
-      {/* Standard Probabilities Table */}
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium text-neutral dark:text-gray-400">Standard Probabilities</h3>
+      <div className="mb-4">
+        <div className="text-sm text-neutral font-medium mb-2">Standard Probabilities</div>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="min-w-full text-sm border rounded">
             <thead>
-              <tr className="border-b dark:border-gray-700">
-                <th className="text-left py-2 px-4 text-sm font-medium text-neutral dark:text-gray-400">Standard</th>
-                <th className="text-left py-2 px-4 text-sm font-medium text-neutral dark:text-gray-400">Probability</th>
-                <th className="text-left py-2 px-4 text-sm font-medium text-neutral dark:text-gray-400">Reason</th>
+              <tr className="bg-gray-50 dark:bg-gray-900">
+                <th className="px-3 py-2 text-left font-semibold">Standard</th>
+                <th className="px-3 py-2 text-left font-semibold">Probability</th>
+                <th className="px-3 py-2 text-left font-semibold">Reason</th>
               </tr>
             </thead>
             <tbody>
-              {response.standard_probabilities.map((item, index) => (
-                <tr key={index} className="border-b dark:border-gray-700">
-                  <td className="py-2 px-4 text-sm">{item.standard}</td>
-                  <td className="py-2 px-4 text-sm">{(item.probability * 100).toFixed(1)}%</td>
-                  <td className="py-2 px-4 text-sm">{item.reason}</td>
+              {standard_probabilities.map((prob, idx) => (
+                <tr key={prob.standard} className="border-t border-gray-100 dark:border-gray-800">
+                  <td className="px-3 py-2 font-mono">{prob.standard}</td>
+                  <td className="px-3 py-2">{(prob.probability * 100).toFixed(1)}%</td>
+                  <td className="px-3 py-2">{prob.reason}</td>
                 </tr>
               ))}
             </tbody>
@@ -62,21 +62,27 @@ export function ReverseEngineeringResponse({ response, className }: ReverseEngin
         </div>
       </div>
 
-      {/* Key Features */}
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium text-neutral dark:text-gray-400">Key Features</h3>
-        <ul className="list-disc list-inside space-y-1">
-          {response.key_features.map((feature, index) => (
-            <li key={index} className="text-sm">{feature}</li>
-          ))}
-        </ul>
-      </div>
+      {key_features && key_features.length > 0 && (
+        <div className="mb-4">
+          <div className="text-sm text-neutral font-medium mb-1">Key Features</div>
+          <ul className="list-disc list-inside text-sm text-dark dark:text-white">
+            {key_features.map((feature, idx) => (
+              <li key={idx}>{feature}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-      {/* Detailed Explanation */}
-      <div className="space-y-2">
-        <h3 className="text-sm font-medium text-neutral dark:text-gray-400">Detailed Explanation</h3>
-        <p className="text-sm whitespace-pre-wrap">{response.detailed_explanation}</p>
-      </div>
-    </motion.div>
+      {detailed_explanation && (
+        <div className="mb-2">
+          <div className="text-sm text-neutral font-medium mb-1">Detailed Explanation</div>
+          <div className="text-sm text-dark dark:text-white whitespace-pre-line">{detailed_explanation}</div>
+        </div>
+      )}
+
+      {timestamp && (
+        <div className="text-xs text-neutral text-right mt-4">{timestamp}</div>
+      )}
+    </div>
   )
 } 

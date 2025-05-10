@@ -23,7 +23,7 @@ const challenges: Challenge[] = [
   { id: "use-cases", name: "Use Case Scenario", topic: "Use Case Scenario" },
   { id: "reverse-transactions", name: "Reverse Transactions", topic: "Reverse Transactions" },
   { id: "standards-enhancement", name: "Standards Enhancements", topic: "Standards Enhancements" },
-  { id: "custom-category", name: "Team Own Category", topic: "Team Own Category" },
+  { id: "custom-category", name: "FinFraud Shield", topic: "FinFraud Shield" },
 ]
 
 // Utility to map topic to API endpoint
@@ -35,7 +35,7 @@ const topicToApiEndpoint = (topic: string) => {
       return "/api/ai/reverse";
     case "Standards Enhancements":
       return "/api/ai/standards";
-    case "Team Own Category":
+    case "FinFraud Shield":
       return "/api/ai/team";
     default:
       return "/api/ai/general";
@@ -51,7 +51,7 @@ const topicToServiceId = (topic: string) => {
       return "service2";
     case "Standards Enhancements":
       return "service3";
-    case "Team Own Category":
+    case "FinFraud Shield":
       return "service4";
     default:
       return "service1";
