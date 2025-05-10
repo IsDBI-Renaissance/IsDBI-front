@@ -8,6 +8,7 @@ import { useOnClickOutside } from "@/hooks/use-click-outside"
 export type Challenge = {
   id: string
   name: string
+  topic?: string
 }
 
 interface HeaderDropdownProps {

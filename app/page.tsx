@@ -69,13 +69,13 @@ export default function Home() {
             </div>
           </div>
           <div className="w-full flex justify-center mt-8">
-            <div className="bg-primary/5 rounded-3xl p-2 shadow-lg w-full max-w-5xl">
+            <div className="bg-primary/5 rounded-3xl p-4 w-full max-w-7xl flex justify-center items-center" style={{ boxShadow: '0 8px 40px 0 rgba(139, 92, 246, 0.35)' }}>
               <Image
                 src={img1}
                 alt="Islamic Finance AI Dashboard Screenshot"
-                width={1200}
-                height={600}
-                className="w-full h-auto rounded-2xl shadow-lg border border-primary/10"
+                width={1400}
+                height={750}
+                className="w-full h-auto rounded-2xl border-2 border-primary shadow-[0_8px_40px_0_rgba(139,92,246,0.35)]"
                 priority
               />
             </div>

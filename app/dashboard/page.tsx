@@ -15,11 +15,27 @@ import ReactMarkdown from 'react-markdown';
 
 // Sample challenges
 const challenges: Challenge[] = [
-  { id: "use-cases", name: "Use Case Scenarios" },
-  { id: "reverse-transactions", name: "Reverse Transactions" },
-  { id: "standards-enhancement", name: "Standards Enhancement" },
-  { id: "custom-category", name: "Team's Own Category" },
+  { id: "use-cases", name: "Use Case Scenario", topic: "Use Case Scenario" },
+  { id: "reverse-transactions", name: "Reverse Transactions", topic: "Reverse Transactions" },
+  { id: "standards-enhancement", name: "Standards Enhancements", topic: "Standards Enhancements" },
+  { id: "custom-category", name: "Team Own Category", topic: "Team Own Category" },
 ]
+
+// Utility to map topic to API endpoint
+const topicToApiEndpoint = (topic: string) => {
+  switch (topic) {
+    case "Use Case Scenario":
+      return "/api/ai/use-case";
+    case "Reverse Transactions":
+      return "/api/ai/reverse";
+    case "Standards Enhancements":
+      return "/api/ai/standards";
+    case "Team Own Category":
+      return "/api/ai/team";
+    default:
+      return "/api/ai/general";
+  }
+};
 
 // Initial sample conversations
 const initialConversations = [
@@ -28,6 +44,8 @@ const initialConversations = [
     title: "Ijarah (Lease-to-Own) Accounting",
     date: "3 days ago",
     createdAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
+    topic: "Use Case Scenario",
+    challengeId: "use-cases",
     messages: [
       {
         id: "1-1",
@@ -60,6 +78,8 @@ const initialConversations = [
     title: "Reverse Engineering Journal Entries",
     date: "1 week ago",
     createdAt: Date.now() - 7 * 24 * 60 * 60 * 1000,
+    topic: "Reverse Transactions",
+    challengeId: "reverse-transactions",
     messages: [
       {
         id: "2-1",
@@ -92,6 +112,8 @@ const initialConversations = [
     title: "Standards Clarification – FAS 10",
     date: "2 weeks ago",
     createdAt: Date.now() - 14 * 24 * 60 * 60 * 1000,
+    topic: "Standards Enhancements",
+    challengeId: "standards-enhancement",
     messages: [
       {
         id: "3-1",
@@ -174,6 +196,7 @@ export default function Dashboard() {
       createdAt: Date.now(),
       messages: [],
       challengeId: selectedChallenge.id,
+      topic: selectedChallenge.topic ?? selectedChallenge.name,
     };
     setConversations((prev) => [newConversation, ...prev]);
     setCurrentConversationId(newId);
@@ -192,6 +215,7 @@ export default function Dashboard() {
       createdAt: Date.now(),
       messages: [],
       challengeId: selectedChallenge.id,
+      topic: selectedChallenge.topic ?? selectedChallenge.name,
     };
     setConversations((prev) => [newConversation, ...prev]);
     setCurrentConversationId(newId);
@@ -225,9 +249,12 @@ export default function Dashboard() {
     setIsLoading(true);
     // Simulate AI response
     setTimeout(() => {
+      // Get the topic from the current conversation
+      const conv = conversations.find((c) => c.id === currentConversationId);
+      const topic = conv?.topic || "";
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: `This is a simulated response for the "${selectedChallenge.name}" challenge based on your query: "${content}"`,
+        content: `This is a simulated response for the "${topic}" challenge based on your query: "${content}"`,
         isUser: false,
         timestamp: new Date().toLocaleTimeString(),
       };
@@ -310,9 +337,12 @@ export default function Dashboard() {
           // Simulate AI response
           setIsLoading(true);
           setTimeout(() => {
+            // Get the topic from the current conversation
+            const conv = conversations.find((c) => c.id === currentConversationId);
+            const topic = conv?.topic || "";
             const aiResponse: Message = {
               id: (Date.now() + 1).toString(),
-              content: `I've analyzed the file "${file.name}" for the "${selectedChallenge.name}" challenge. Here are my findings...`,
+              content: `I've analyzed the file "${file.name}" for the "${topic}" challenge. Here are my findings...`,
               isUser: false,
               timestamp: new Date().toLocaleTimeString(),
             };
