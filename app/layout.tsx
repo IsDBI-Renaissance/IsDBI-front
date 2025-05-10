@@ -8,9 +8,12 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "FinStandAI - AI-Powered Logistics Optimization",
+  title: "Mizanex",
   description: "Optimize your logistics operations with our AI-powered platform",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/images/Mizanex-icon.png',
+  }
 }
 
 export default function RootLayout({

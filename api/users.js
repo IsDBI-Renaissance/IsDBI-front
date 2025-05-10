@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 export const registerUser = async ({ name, email, password }) => {
-  const response = await axios.post('http://localhost:5000/api/auth/register', {
+  const response = await axios.post('http://localhost:3000/auth/register', {
     name,
     email,
     password,
@@ -12,7 +12,7 @@ export const registerUser = async ({ name, email, password }) => {
 
 // api/loginUser.ts
 export const loginUser = async ({ email, password }) => {
-  const response = await axios.post('http://localhost:5000/api/auth/login', {
+  const response = await axios.post('http://localhost:3000/auth/login', {
     email,
     password,
   });

@@ -24,11 +24,8 @@ export default function Home() {
         <div className="container-custom flex items-center justify-between gap-4">
           {/* Logo */}
           <div className="flex items-center min-w-[120px]">
-            <span className="flex items-center text-primary font-bold text-2xl">
-              <svg className="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z" />
-              </svg>
-              Islamic Finance
+            <span className="flex items-center">
+              <Image src="/images/Mizanex.png" alt="Mizanex" width={160} height={160} className="mr-2" />
             </span>
           </div>
           {/* Centered Nav */}
@@ -59,10 +56,10 @@ export default function Home() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
               <span className="block text-dark dark:text-light">The Path</span>
               <span className="block text-primary">To Shariah-Compliant Automation</span>
-              <span className="block text-primary-light">Starts With FinStandAI</span>
+              <span className="block text-primary-light">Starts With Mizanex</span>
             </h1>
             <p className="text-neutral text-lg md:text-xl mb-6">
-              FinStandAI is the next-generation AI platform for Islamic finance. Automate, analyze, and assure — with clarity and confidence.
+              Mizanex is the next-generation AI platform for Islamic finance. Automate, analyze, and assure — with clarity and confidence.
             </p>
             <div className="mb-4 flex justify-center items-center gap-2 text-sm text-primary font-semibold">
               Press <kbd className="px-2 py-1 bg-primary/10 rounded border border-primary/20">F</kbd> any time to get Started!
@@ -94,7 +91,7 @@ export default function Home() {
             </div>
             <div className="flex-1 text-left">
               <h3 className="text-2xl font-bold mb-4 text-dark">Empower Islamic finance with next-gen AI</h3>
-              <p className="text-neutral text-lg mb-2">FinStandAI transforms Shariah-compliant financial operations using AI-driven automation — no manuals, no complexity. Generate journal entries and detect contract types effortlessly.</p>
+              <p className="text-neutral text-lg mb-2">Mizanex transforms Shariah-compliant financial operations using AI-driven automation — no manuals, no complexity. Generate journal entries and detect contract types effortlessly.</p>
             </div>
           </div>
           {/* Feature 2 */}
@@ -104,7 +101,7 @@ export default function Home() {
             </div>
             <div className="flex-1 text-left">
               <h3 className="text-2xl font-bold mb-4 text-dark">Reclaim control of your accounting process</h3>
-              <p className="text-neutral text-lg mb-2">Say goodbye to tedious interpretation of AAOIFI standards. FinStandAI helps professionals focus on decision-making, not decoding complex guidelines.</p>
+              <p className="text-neutral text-lg mb-2">Say goodbye to tedious interpretation of AAOIFI standards. Mizanex helps professionals focus on decision-making, not decoding complex guidelines.</p>
             </div>
           </div>
           {/* Feature 3 */}
@@ -131,21 +128,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-dark text-white">
-        <div className="container-custom flex flex-col md:flex-row justify-between items-center rounded-2xl bg-dark p-8 shadow-xl">
-          <div>
-            <h3 className="text-2xl font-bold mb-2">We are at your disposal</h3>
-            <p className="text-gray-300">Our team is ready to answer your questions and help you get started.</p>
-          </div>
-          <Link href="/signup">
-            <Button variant="secondary" className="mt-6 md:mt-0 scale-up pulse">
-              Get Started
-            </Button>
-          </Link>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="py-12 bg-white">
         <div className="container-custom">
@@ -153,10 +135,7 @@ export default function Home() {
             <div>
               <div className="text-primary font-bold text-2xl mb-6">
                 <span className="flex items-center">
-                  <svg className="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z" />
-                  </svg>
-                  FreightMee
+                  <Image src="/images/Mizanex.png" alt="Mizanex" width={120} height={120} className="mr-2" />
                 </span>
               </div>
               <div className="flex space-x-4">
@@ -259,7 +238,7 @@ export default function Home() {
             </div>
           </div>
           <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-neutral">© 2024, FreightMee. All Rights Reserved.</p>
+            <p className="text-sm text-neutral">© 2024, Mizanex. All Rights Reserved.</p>
             <div className="mt-4 md:mt-0">
               <span className="text-sm text-neutral">English</span>
             </div>

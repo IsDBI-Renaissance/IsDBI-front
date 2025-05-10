@@ -12,6 +12,8 @@ import Link from "next/link"
 import { LogOut, Plus, Search, History, User, FileText, Trash2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import ReactMarkdown from 'react-markdown';
+import Image from "next/image"
+import { AnimatedResponse } from "@/components/chat/animated-response"
 
 // Sample challenges
 const challenges: Challenge[] = [
@@ -402,11 +404,9 @@ export default function Dashboard() {
               <SidebarHeader>
                 <div className="flex items-center justify-between">
                   <div className="text-primary font-bold text-lg flex items-center">
-                    <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z" />
-                    </svg>
-                    <Link href={'/'}>IslamicFinance</Link>
-                    
+                    <Link href="/">
+                      <Image src="/images/Mizanex.png" alt="Mizanex" width={120} height={120} className="mr-2" />
+                    </Link>
                   </div>
                   <div className="flex gap-2 items-center">
                     {isMobile && (
@@ -558,28 +558,12 @@ export default function Dashboard() {
         {/* Chat Container */}
         <div className="chat-messages dark:bg-dark overflow-y-auto max-h-[calc(100vh-8rem)] px-0 sm:px-2 md:px-4">
           {messages.map((message, index) => (
-            <motion.div
+            <AnimatedResponse
               key={message.id}
-              className={`flex w-full ${message.isUser ? "justify-end" : "justify-start"}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-            >
-              <div
-                className={`chat-message ${
-                  message.isUser
-                    ? "chat-message-user bg-primary text-white"
-                    : "chat-message-ai bg-white dark:bg-dark-accent dark:border-gray-700"
-                }`}
-              >
-                <div className="prose prose-sm max-w-none dark:prose-invert"><ReactMarkdown>{message.content}</ReactMarkdown></div>
-                {message.timestamp && (
-                  <div className={`text-xs mt-2 ${message.isUser ? "text-white/70" : "text-neutral"}`}>
-                    {message.timestamp}
-                  </div>
-                )}
-              </div>
-            </motion.div>
+              content={message.content}
+              isUser={message.isUser}
+              timestamp={message.timestamp}
+            />
           ))}
           {isLoading && (
             <motion.div

@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
           // Fetch user data
-          const response = await axios.get('http://localhost:5000/api/auth/me');
+          const response = await axios.get('http://localhost:3000/api/auth/me');
           setUser(response.data.user);
         } catch (error) {
           // If token is invalid, remove it
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     setLoading(true)
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('http://localhost:3000/auth/login', {
         email,
         password,
       });
@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = async (name: string, email: string, password: string) => {
     setLoading(true)
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post('http://localhost:3000/api/auth/register', {
         name,
         email,
         password,
@@ -127,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateProfile = async (data: { name?: string; email?: string; currentPassword?: string; newPassword?: string }) => {
     setLoading(true)
     try {
-      const response = await axios.patch('http://localhost:5000/api/auth/profile', data);
+      const response = await axios.patch('http://localhost:3000/api/auth/profile', data);
       setUser(response.data.user);
     } finally {
       setLoading(false)
