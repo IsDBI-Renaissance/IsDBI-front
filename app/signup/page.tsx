@@ -92,7 +92,7 @@ export default function Signup() {
     
     try {
       const data = await registerUser({ name, email, password });
-      Cookies.set('token', data.token, { expires: 7 }); // Store token
+      Cookies.set('token', data.access_token, { expires: 7 }); // Store token
       
       // Initialize user state with the returned user data
       initializeUser(data.user);

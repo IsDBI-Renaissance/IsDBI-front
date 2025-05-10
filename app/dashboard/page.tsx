@@ -14,6 +14,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import ReactMarkdown from 'react-markdown';
 import Image from "next/image"
 import { AnimatedResponse } from "@/components/chat/animated-response"
+import axios from "axios"
+import Cookies from "js-cookie"
 
 // Sample challenges
 const challenges: Challenge[] = [
@@ -36,6 +38,22 @@ const topicToApiEndpoint = (topic: string) => {
       return "/api/ai/team";
     default:
       return "/api/ai/general";
+  }
+};
+
+// Utility to map topic to service ID
+const topicToServiceId = (topic: string) => {
+  switch (topic) {
+    case "Use Case Scenario":
+      return "service1";
+    case "Reverse Transactions":
+      return "service2";
+    case "Standards Enhancements":
+      return "service3";
+    case "Team Own Category":
+      return "service4";
+    default:
+      return "service1";
   }
 };
 
@@ -142,7 +160,7 @@ const initialConversations = [
         timestamp: "11:03 AM",
       },
     ],
-  },
+  }
 ]
 
 export default function Dashboard() {
@@ -226,14 +244,16 @@ export default function Dashboard() {
   };
 
   // Send a message in the current conversation
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     if (!currentConversationId) return;
+    
     const newMessage: Message = {
       id: Date.now().toString(),
       content,
       isUser: true,
       timestamp: new Date().toLocaleTimeString(),
     };
+    
     setConversations((prev) =>
       prev.map((conv) => {
         if (conv.id === currentConversationId) {
@@ -248,18 +268,44 @@ export default function Dashboard() {
         return conv;
       })
     );
+    
     setIsLoading(true);
-    // Simulate AI response
-    setTimeout(() => {
+    
+    try {
       // Get the topic from the current conversation
       const conv = conversations.find((c) => c.id === currentConversationId);
-      const topic = conv?.topic || "";
+      if (!conv) {
+        throw new Error('Conversation not found');
+      }
+      
+      const topic = conv.topic;
+      const serviceId = topicToServiceId(topic);
+      
+      // Get token from cookies
+      const token = Cookies.get('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in again.');
+      }
+      
+      // Create form data
+      const formData = new FormData();
+      formData.append('text', content);
+      
+      // Send request to backend
+      const response = await axios.post(`http://localhost:3000/gateway/${serviceId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+      
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: `This is a simulated response for the "${topic}" challenge based on your query: "${content}"`,
+        content: JSON.stringify(response.data || {}, null, 2),
         isUser: false,
         timestamp: new Date().toLocaleTimeString(),
       };
+      
       setConversations((prev) =>
         prev.map((conv) =>
           conv.id === currentConversationId
@@ -267,8 +313,39 @@ export default function Dashboard() {
             : conv
         )
       );
+    } catch (error) {
+      console.error('Error sending message:', error);
+      let errorMessage = 'Sorry, I encountered an error. Please try again.';
+      
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          errorMessage = 'Your session has expired. Please log in again.';
+          // Optionally redirect to login page or trigger re-authentication
+          logout();
+        } else if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: errorMessage,
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === currentConversationId
+            ? { ...conv, messages: [...conv.messages, errorResponse] }
+            : conv
+        )
+      );
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   // Load a conversation and set as current
@@ -294,13 +371,14 @@ export default function Dashboard() {
     }
   };
 
-  // File upload logic (optional: you can group uploads per conversation if needed)
-  const handleFileUpload = (files: File[]) => {
+  // Handle file upload
+  const handleFileUpload = async (files: File[]) => {
     if (!currentConversationId) return;
     
-    files.forEach((file) => {
+    files.forEach(async (file) => {
+      const fileId = Date.now().toString();
+      
       // Create initial file entry with 0 progress
-      const fileId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
       setUploadedFiles(prev => [...prev, {
         id: fileId,
         name: file.name,
@@ -308,57 +386,106 @@ export default function Dashboard() {
         type: file.type,
         progress: 0
       }]);
-
-      // Simulate file upload with progress
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 10;
-        setUploadedFiles(prev => 
-          prev.map(f => f.id === fileId ? { ...f, progress: Math.min(progress, 100) } : f)
-        );
-
-        if (progress >= 100) {
-          clearInterval(interval);
-          
-          // Add message to conversation after upload completes
-          const fileMessage: Message = {
-            id: fileId,
-            content: `Uploaded file: ${file.name}`,
-            isUser: true,
-            timestamp: new Date().toLocaleTimeString(),
-          };
-          
-          setConversations((prev) =>
-            prev.map((conv) =>
-              conv.id === currentConversationId
-                ? { ...conv, messages: [...conv.messages, fileMessage], title: conv.messages.length === 0 ? (fileMessage.content.length > 30 ? fileMessage.content.substring(0, 30) + "..." : fileMessage.content) : conv.title }
-                : conv
-            )
-          );
-
-          // Simulate AI response
-          setIsLoading(true);
-          setTimeout(() => {
-            // Get the topic from the current conversation
-            const conv = conversations.find((c) => c.id === currentConversationId);
-            const topic = conv?.topic || "";
-            const aiResponse: Message = {
-              id: (Date.now() + 1).toString(),
-              content: `I've analyzed the file "${file.name}" for the "${topic}" challenge. Here are my findings...`,
-              isUser: false,
-              timestamp: new Date().toLocaleTimeString(),
-            };
-            setConversations((prev) =>
-              prev.map((conv) =>
-                conv.id === currentConversationId
-                  ? { ...conv, messages: [...conv.messages, aiResponse] }
-                  : conv
-              )
-            );
-            setIsLoading(false);
-          }, 2000);
+      
+      try {
+        // Get the topic from the current conversation
+        const conv = conversations.find((c) => c.id === currentConversationId);
+        if (!conv) {
+          throw new Error('Conversation not found');
         }
-      }, 200); // Update progress every 200ms
+        
+        const topic = conv.topic;
+        const serviceId = topicToServiceId(topic);
+        
+        // Get token from cookies
+        const token = Cookies.get('token');
+        if (!token) {
+          throw new Error('No authentication token found. Please log in again.');
+        }
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Send request to backend
+        const response = await axios.post(`http://localhost:3000/gateway/${serviceId}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+            setUploadedFiles(prev => 
+              prev.map(f => f.id === fileId ? { ...f, progress } : f)
+            );
+          },
+        });
+        
+        // Add file message to conversation
+        const fileMessage: Message = {
+          id: fileId,
+          content: `Uploaded file: ${file.name}`,
+          isUser: true,
+          timestamp: new Date().toLocaleTimeString(),
+        };
+        
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === currentConversationId
+              ? { ...conv, messages: [...conv.messages, fileMessage], title: conv.messages.length === 0 ? (fileMessage.content.length > 30 ? fileMessage.content.substring(0, 30) + "..." : fileMessage.content) : conv.title }
+              : conv
+          )
+        );
+        
+        // Add AI response
+        const aiResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          content: JSON.stringify(response.data || {}, null, 2),
+          isUser: false,
+          timestamp: new Date().toLocaleTimeString(),
+        };
+        
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === currentConversationId
+              ? { ...conv, messages: [...conv.messages, aiResponse] }
+              : conv
+          )
+        );
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        let errorMessage = `Error uploading file ${file.name}. Please try again.`;
+        
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            errorMessage = 'Your session has expired. Please log in again.';
+            // Optionally redirect to login page or trigger re-authentication
+            logout();
+          } else if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          }
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        
+        const errorResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          content: errorMessage,
+          isUser: false,
+          timestamp: new Date().toLocaleTimeString(),
+        };
+        
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === currentConversationId
+              ? { ...conv, messages: [...conv.messages, errorResponse] }
+              : conv
+          )
+        );
+      } finally {
+        // Remove file from uploaded files list
+        setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
+      }
     });
   };
 

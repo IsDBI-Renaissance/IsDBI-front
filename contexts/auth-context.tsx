@@ -77,13 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
 
-      const { token, user: userData } = response.data;
+      const { access_token, user: userData } = response.data;
       
       // Store token in cookie
-      Cookies.set('token', token, { expires: 7 });
+      Cookies.set('token', access_token, { expires: 7 });
       
       // Set token in axios headers
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
       setUser(userData);
     } finally {
@@ -101,13 +101,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
 
-      const { token, user: userData } = response.data;
+      const { access_token, user: userData } = response.data;
       
       // Store token in cookie
-      Cookies.set('token', token, { expires: 7 });
+      Cookies.set('token', access_token, { expires: 7 });
       
       // Set token in axios headers
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
       setUser(userData);
     } finally {
