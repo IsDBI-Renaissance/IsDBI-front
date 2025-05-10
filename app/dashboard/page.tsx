@@ -16,6 +16,7 @@ import Image from "next/image"
 import { AnimatedResponse } from "@/components/chat/animated-response"
 import axios from "axios"
 import Cookies from "js-cookie"
+import { JournalEntryForm } from "@/components/chat/journal-entry-form"
 
 // Sample challenges
 const challenges: Challenge[] = [
@@ -222,8 +223,110 @@ export default function Dashboard() {
     setCurrentConversationId(newId);
     setActiveInput(null);
     setUploadedFiles([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChallenge]);
+
+  // Handle journal entry form submission for Reverse Transactions
+  const handleJournalEntrySubmit = async (data: { entries: any[], description: string }) => {
+    if (!currentConversationId) return;
+
+    const messageContent = JSON.stringify(data, null, 2);
+
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      content: messageContent,
+      isUser: true,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+
+    setConversations((prev) =>
+      prev.map((conv) => {
+        if (conv.id === currentConversationId) {
+          const isFirst = conv.messages.length === 0;
+          return {
+            ...conv,
+            messages: [...conv.messages, newMessage],
+            title: isFirst ? "Journal Entry Analysis" : conv.title,
+          };
+        }
+        return conv;
+      })
+    );
+
+    setIsLoading(true);
+
+    try {
+      const conv = conversations.find((c) => c.id === currentConversationId);
+      if (!conv) {
+        throw new Error('Conversation not found');
+      }
+
+      const token = Cookies.get('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in again.');
+      }
+
+      // Send JSON body, not FormData
+      const response = await axios.post(
+        `http://localhost:3000/gateway/service2`,
+        {
+          entries: data.entries,
+          description: data.description,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        }
+      );
+
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: JSON.stringify(response.data || {}, null, 2),
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === currentConversationId
+            ? { ...conv, messages: [...conv.messages, aiResponse] }
+            : conv
+        )
+      );
+    } catch (error) {
+      console.error('Error analyzing journal entries:', error);
+      let errorMessage = 'Sorry, I encountered an error. Please try again.';
+
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          errorMessage = 'Your session has expired. Please log in again.';
+          logout();
+        } else if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: errorMessage,
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === currentConversationId
+            ? { ...conv, messages: [...conv.messages, errorResponse] }
+            : conv
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Start a new conversation
   const startNewChat = () => {
@@ -684,19 +787,31 @@ export default function Dashboard() {
 
         {/* Chat Container */}
         <div className="chat-messages dark:bg-dark overflow-y-auto max-h-[calc(100vh-8rem)] px-0 sm:px-2 md:px-4">
-          {messages.map((message, index) => {
-            // Only animate new AI messages that are being added in real-time
-            const isNewMessage = index === messages.length - 1 && !message.isUser
-            return (
-              <AnimatedResponse
-                key={message.id}
-                content={message.content}
-                isUser={message.isUser}
-                timestamp={message.timestamp}
-                shouldAnimate={isNewMessage}
-              />
-            )
-          })}
+          {messages.length === 0 && selectedChallenge.id === "reverse-transactions" ? (
+            <div className="flex items-center justify-center h-full">
+              <motion.div
+                className="w-full max-w-2xl p-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <JournalEntryForm onSubmit={handleJournalEntrySubmit} isLoading={isLoading} />
+              </motion.div>
+            </div>
+          ) : (
+            messages.map((message, index) => {
+              const isNewMessage = index === messages.length - 1 && !message.isUser;
+              return (
+                <AnimatedResponse
+                  key={message.id}
+                  content={message.content}
+                  isUser={message.isUser}
+                  timestamp={message.timestamp}
+                  shouldAnimate={isNewMessage}
+                />
+              );
+            })
+          )}
           {isLoading && (
             <motion.div
               className="flex justify-start"
@@ -731,13 +846,14 @@ export default function Dashboard() {
                 onClick={() => toggleRightSidebar()}
                 className="p-2 rounded-full text-neutral hover:text-primary hover:bg-primary-light/30 transition-colors"
                 title="Attach file"
+                disabled={selectedChallenge.id === "reverse-transactions"}
               >
                 <FileText className="w-5 h-5" />
               </button>
             )}
             <textarea
-              placeholder="Type your message..."
-              disabled={isLoading}
+              placeholder={selectedChallenge.id === "reverse-transactions" ? "Use the journal entry form above to analyze transactions" : "Type your message..."}
+              disabled={isLoading || selectedChallenge.id === "reverse-transactions"}
               className="chat-textarea dark:bg-dark-accent dark:text-white"
               rows={1}
               onKeyDown={(e) => {
@@ -758,7 +874,7 @@ export default function Dashboard() {
             />
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || selectedChallenge.id === "reverse-transactions"}
               className="chat-send-button"
               title="Send message"
             >
@@ -819,6 +935,7 @@ export default function Dashboard() {
                   onUpload={handleFileUpload}
                   uploadedFiles={uploadedFiles}
                   onRemoveFile={handleRemoveFile}
+                  disabled={selectedChallenge.id === "reverse-transactions"}
                 />
               </SidebarContent>
             </motion.div>

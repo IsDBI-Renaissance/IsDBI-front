@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import { Upload, X, FileText, File } from "lucide-react"
+import { Upload, X, FileText, File, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
@@ -24,6 +24,7 @@ interface FileUploadProps {
   className?: string
   uploadedFiles?: UploadedFile[]
   onRemoveFile?: (fileId: string) => void
+  disabled?: boolean
 }
 
 export function FileUpload({
@@ -34,6 +35,7 @@ export function FileUpload({
   className,
   uploadedFiles = [],
   onRemoveFile,
+  disabled = false,
 }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -113,18 +115,12 @@ export function FileUpload({
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.length) return
-
-    const files = Array.from(e.target.files)
-    const validFiles = validateFiles(files)
-
-    if (validFiles.length > 0) {
-      onUpload(validFiles)
-    }
-
-    // Reset the input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+    if (e.target.files) {
+      onUpload(Array.from(e.target.files))
+      // Reset the input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
     }
   }
 
@@ -135,11 +131,9 @@ export function FileUpload({
   return (
     <div className={cn("space-y-4", className)}>
       <div
-        className={cn("file-upload-area", isDragging ? "file-upload-area-dragging" : "file-upload-area-default")}
-        onDragOver={handleDragOver}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        className={`border-2 border-dashed rounded-lg p-6 text-center ${
+          disabled ? 'border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-800' : 'border-primary/30 hover:border-primary/50'
+        }`}
       >
         <input
           ref={fileInputRef}
@@ -148,6 +142,7 @@ export function FileUpload({
           className="hidden"
           accept={acceptedFileTypes.join(",")}
           onChange={handleFileChange}
+          disabled={disabled}
         />
 
         <motion.div
@@ -176,8 +171,9 @@ export function FileUpload({
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="mt-2 scale-up dark:border-gray-700 dark:text-white"
+                  className={`mt-2 scale-up dark:border-gray-700 dark:text-white ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                   onClick={handleBrowseClick}
+                  disabled={disabled}
                 >
                   Browse files
                 </Button>
@@ -238,6 +234,7 @@ export function FileUpload({
                       type="button"
                       onClick={() => onRemoveFile(file.id)}
                       className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-neutral transition-colors flex-shrink-0"
+                      disabled={disabled}
                     >
                       <X className="w-4 h-4" />
                     </button>
