@@ -8,14 +8,15 @@ interface AnimatedResponseProps {
   content: string
   isUser: boolean
   timestamp?: string
+  shouldAnimate?: boolean
 }
 
-export function AnimatedResponse({ content, isUser, timestamp }: AnimatedResponseProps) {
+export function AnimatedResponse({ content, isUser, timestamp, shouldAnimate = false }: AnimatedResponseProps) {
   const [displayedContent, setDisplayedContent] = useState('')
-  const [isAnimating, setIsAnimating] = useState(true)
+  const [isAnimating, setIsAnimating] = useState(shouldAnimate)
 
   useEffect(() => {
-    if (!isUser) {
+    if (!isUser && shouldAnimate) {
       setIsAnimating(true)
       setDisplayedContent('')
       
@@ -38,7 +39,7 @@ export function AnimatedResponse({ content, isUser, timestamp }: AnimatedRespons
       setDisplayedContent(content)
       setIsAnimating(false)
     }
-  }, [content, isUser])
+  }, [content, isUser, shouldAnimate])
 
   return (
     <motion.div

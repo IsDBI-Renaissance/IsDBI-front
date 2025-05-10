@@ -557,14 +557,19 @@ export default function Dashboard() {
 
         {/* Chat Container */}
         <div className="chat-messages dark:bg-dark overflow-y-auto max-h-[calc(100vh-8rem)] px-0 sm:px-2 md:px-4">
-          {messages.map((message, index) => (
-            <AnimatedResponse
-              key={message.id}
-              content={message.content}
-              isUser={message.isUser}
-              timestamp={message.timestamp}
-            />
-          ))}
+          {messages.map((message, index) => {
+            // Only animate new AI messages that are being added in real-time
+            const isNewMessage = index === messages.length - 1 && !message.isUser
+            return (
+              <AnimatedResponse
+                key={message.id}
+                content={message.content}
+                isUser={message.isUser}
+                timestamp={message.timestamp}
+                shouldAnimate={isNewMessage}
+              />
+            )
+          })}
           {isLoading && (
             <motion.div
               className="flex justify-start"
