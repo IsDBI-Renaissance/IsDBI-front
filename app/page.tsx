@@ -87,31 +87,32 @@ export default function Home() {
           {/* Feature 1 */}
           <div className="flex flex-col md:flex-row items-center gap-12 mb-20">
             <div className="flex-1 bg-primary/5 rounded-2xl p-8 flex items-center justify-center">
-              <Image src="/images/ai-automation.svg" alt="AI Automation" width={400} height={300} className="w-full h-auto" />
+              <Image src="/images/file-upload.png" alt="AI Automation" width={400} height={300} className="w-full h-auto" />
             </div>
             <div className="flex-1 text-left">
-              <h3 className="text-2xl font-bold mb-4 text-dark">Empower Islamic finance with next-gen AI</h3>
-              <p className="text-neutral text-lg mb-2">Mizanex transforms Shariah-compliant financial operations using AI-driven automation — no manuals, no complexity. Generate journal entries and detect contract types effortlessly.</p>
+              <h3 className="text-2xl font-bold mb-4 text-dark">Upload your document to get started</h3>
+              <p className="text-neutral text-lg mb-2">Easily drag and drop your Shariah finance files or browse to upload. Mizanex will instantly analyze, extract, and process contract data using AI — no manual input needed.</p>
             </div>
           </div>
           {/* Feature 2 */}
           <div className="flex flex-col md:flex-row-reverse items-center gap-12 mb-20">
             <div className="flex-1 bg-primary/5 rounded-2xl p-8 flex items-center justify-center">
-              <Image src="/images/accounting-control.svg" alt="Accounting Control" width={400} height={300} className="w-full h-auto" />
+              <Image src="/images/history.jpg" alt="Accounting Control" width={400} height={300} className="w-full h-auto" />
             </div>
             <div className="flex-1 text-left">
-              <h3 className="text-2xl font-bold mb-4 text-dark">Reclaim control of your accounting process</h3>
-              <p className="text-neutral text-lg mb-2">Say goodbye to tedious interpretation of AAOIFI standards. Mizanex helps professionals focus on decision-making, not decoding complex guidelines.</p>
+              <h3 className="text-2xl font-bold mb-4 text-dark">Your Smart Shariah Workspace</h3>
+              <p className="text-neutral text-lg mb-2">Track all your AI-powered finance analyses in one place.
+From journal entries to contract breakdowns, revisit your insights anytime — structured, sorted, and always at your fingertips.</p>
             </div>
           </div>
           {/* Feature 3 */}
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1 bg-primary/5 rounded-2xl p-8 flex items-center justify-center">
-              <Image src="/images/compliance.svg" alt="Compliance and Clarity" width={400} height={300} className="w-full h-auto" />
+              <Image src="/images/form.jpg" alt="Compliance and Clarity" width={400} height={300} className="w-full h-auto" />
             </div>
             <div className="flex-1 text-left">
-              <h3 className="text-2xl font-bold mb-4 text-dark">AI-enhanced compliance and clarity</h3>
-              <p className="text-neutral text-lg mb-2">From equity buyouts to Ijarah leasing, our platform decodes the standards behind every transaction. Transparent logic, step-by-step explanations, and full Shariah assurance.</p>
+              <h3 className="text-2xl font-bold mb-4 text-dark">Generate Journal Entries with AI</h3>
+              <p className="text-neutral text-lg mb-2">Fill in your entry name, debit, and credit — then let Mizanex handle the analysis. Fast, accurate, and fully Shariah-compliant.</p>
             </div>
           </div>
         </div>

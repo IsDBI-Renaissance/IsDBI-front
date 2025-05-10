@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { motion } from 'framer-motion'
+import { ReverseEngineeringResponse } from './reverse-engineering-response'
 
 interface AnimatedResponseProps {
   content: string
@@ -14,8 +15,23 @@ interface AnimatedResponseProps {
 export function AnimatedResponse({ content, isUser, timestamp, shouldAnimate = false }: AnimatedResponseProps) {
   const [displayedContent, setDisplayedContent] = useState('')
   const [isAnimating, setIsAnimating] = useState(shouldAnimate)
+  const [isReverseEngineeringResponse, setIsReverseEngineeringResponse] = useState(false)
+  const [parsedResponse, setParsedResponse] = useState<any>(null)
 
   useEffect(() => {
+    // Try to parse the content as a reverse engineering response
+    try {
+      const parsed = JSON.parse(content)
+      if (parsed.most_likely_standard && parsed.standard_probabilities) {
+        setIsReverseEngineeringResponse(true)
+        setParsedResponse(parsed)
+        return
+      }
+    } catch (e) {
+      // Not a JSON response, continue with normal text display
+      setIsReverseEngineeringResponse(false)
+    }
+
     if (!isUser && shouldAnimate) {
       setIsAnimating(true)
       setDisplayedContent('')
@@ -55,12 +71,16 @@ export function AnimatedResponse({ content, isUser, timestamp, shouldAnimate = f
             : "chat-message-ai bg-white dark:bg-dark-accent dark:border-gray-700"
         }`}
       >
-        <div className="prose prose-sm max-w-none dark:prose-invert">
-          <ReactMarkdown>{displayedContent}</ReactMarkdown>
-          {isAnimating && !isUser && (
-            <span className="inline-block w-2 h-4 ml-1 bg-primary animate-pulse" />
-          )}
-        </div>
+        {isReverseEngineeringResponse ? (
+          <ReverseEngineeringResponse response={parsedResponse} />
+        ) : (
+          <div className="prose prose-sm max-w-none dark:prose-invert">
+            <ReactMarkdown>{displayedContent}</ReactMarkdown>
+            {isAnimating && !isUser && (
+              <span className="inline-block w-2 h-4 ml-1 bg-primary animate-pulse" />
+            )}
+          </div>
+        )}
         {timestamp && (
           <div className={`text-xs mt-2 ${isUser ? "text-white/70" : "text-neutral"}`}>
             {timestamp}
