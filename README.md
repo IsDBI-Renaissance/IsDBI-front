@@ -189,3 +189,21 @@ Body: {
 
 ## Author
 LARIBI ABDERRAHIM
+
+## License
+
+This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)**.  
+You are free to use, modify, and share this project **for non-commercial purposes only**, with proper attribution, and under the same license terms.
+
+For full license details, see the [LICENSE](./LICENSE) file.
+
+---
+
+## Notice
+
+The `NOTICE` file contains important information about the licensing and attribution requirements for this project.  
+It summarizes your rights and obligations when using, modifying, or sharing the code under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 license.  
+
+Please read it carefully to understand how to properly credit the original author and comply with the license terms.
+
+See the [NOTICE](./NOTICE) file for more details.
