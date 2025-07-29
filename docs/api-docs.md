@@ -2,8 +2,9 @@
 
 ## Base URL
 ```
-http://localhost:3000/gateway
+${NEXT_PUBLIC_BACKEND_URL}/gateway
 ```
+Note: The base URL is defined by the `NEXT_PUBLIC_BACKEND_URL` environment variable, which defaults to `http://localhost:3000`.
 
 ## Authentication
 All API endpoints require authentication using a JWT token. The token should be included in the Authorization header:

@@ -267,7 +267,7 @@ export default function Dashboard() {
 
       // Send JSON body, not FormData
       const response = await axios.post(
-        `http://localhost:3000/gateway/service2`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/gateway/service2`,
         {
           entries: data.entries,
           description: data.description,
@@ -349,14 +349,14 @@ export default function Dashboard() {
   // Send a message in the current conversation
   const handleSendMessage = async (content: string) => {
     if (!currentConversationId) return;
-    
+
     const newMessage: Message = {
       id: Date.now().toString(),
       content,
       isUser: true,
       timestamp: new Date().toLocaleTimeString(),
     };
-    
+
     setConversations((prev) =>
       prev.map((conv) => {
         if (conv.id === currentConversationId) {
@@ -371,44 +371,44 @@ export default function Dashboard() {
         return conv;
       })
     );
-    
+
     setIsLoading(true);
-    
+
     try {
       // Get the topic from the current conversation
       const conv = conversations.find((c) => c.id === currentConversationId);
       if (!conv) {
         throw new Error('Conversation not found');
       }
-      
+
       const topic = conv.topic;
       const serviceId = topicToServiceId(topic);
-      
+
       // Get token from cookies
       const token = Cookies.get('token');
       if (!token) {
         throw new Error('No authentication token found. Please log in again.');
       }
-      
+
       // Create form data
       const formData = new FormData();
       formData.append('text', content);
-      
+
       // Send request to backend
-      const response = await axios.post(`http://localhost:3000/gateway/${serviceId}`, formData, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/gateway/${serviceId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         },
       });
-      
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         content: JSON.stringify(response.data || {}, null, 2),
         isUser: false,
         timestamp: new Date().toLocaleTimeString(),
       };
-      
+
       setConversations((prev) =>
         prev.map((conv) =>
           conv.id === currentConversationId
@@ -419,7 +419,7 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error sending message:', error);
       let errorMessage = 'Sorry, I encountered an error. Please try again.';
-      
+
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
           errorMessage = 'Your session has expired. Please log in again.';
@@ -431,14 +431,14 @@ export default function Dashboard() {
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      
+
       const errorResponse: Message = {
         id: (Date.now() + 1).toString(),
         content: errorMessage,
         isUser: false,
         timestamp: new Date().toLocaleTimeString(),
       };
-      
+
       setConversations((prev) =>
         prev.map((conv) =>
           conv.id === currentConversationId
@@ -477,10 +477,10 @@ export default function Dashboard() {
   // Handle file upload
   const handleFileUpload = async (files: File[]) => {
     if (!currentConversationId) return;
-    
+
     files.forEach(async (file) => {
       const fileId = Date.now().toString();
-      
+
       // Create initial file entry with 0 progress
       setUploadedFiles(prev => [...prev, {
         id: fileId,
@@ -489,29 +489,29 @@ export default function Dashboard() {
         type: file.type,
         progress: 0
       }]);
-      
+
       try {
         // Get the topic from the current conversation
         const conv = conversations.find((c) => c.id === currentConversationId);
         if (!conv) {
           throw new Error('Conversation not found');
         }
-        
+
         const topic = conv.topic;
         const serviceId = topicToServiceId(topic);
-        
+
         // Get token from cookies
         const token = Cookies.get('token');
         if (!token) {
           throw new Error('No authentication token found. Please log in again.');
         }
-        
+
         // Create form data
         const formData = new FormData();
         formData.append('file', file);
-        
+
         // Send request to backend
-        const response = await axios.post(`http://localhost:3000/gateway/${serviceId}`, formData, {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/gateway/${serviceId}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Authorization': `Bearer ${token}`
@@ -523,7 +523,7 @@ export default function Dashboard() {
             );
           },
         });
-        
+
         // Add file message to conversation
         const fileMessage: Message = {
           id: fileId,
@@ -531,7 +531,7 @@ export default function Dashboard() {
           isUser: true,
           timestamp: new Date().toLocaleTimeString(),
         };
-        
+
         setConversations((prev) =>
           prev.map((conv) =>
             conv.id === currentConversationId
@@ -539,7 +539,7 @@ export default function Dashboard() {
               : conv
           )
         );
-        
+
         // Add AI response
         const aiResponse: Message = {
           id: (Date.now() + 1).toString(),
@@ -547,7 +547,7 @@ export default function Dashboard() {
           isUser: false,
           timestamp: new Date().toLocaleTimeString(),
         };
-        
+
         setConversations((prev) =>
           prev.map((conv) =>
             conv.id === currentConversationId
@@ -558,7 +558,7 @@ export default function Dashboard() {
       } catch (error) {
         console.error('Error uploading file:', error);
         let errorMessage = `Error uploading file ${file.name}. Please try again.`;
-        
+
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 401) {
             errorMessage = 'Your session has expired. Please log in again.';
@@ -570,14 +570,14 @@ export default function Dashboard() {
         } else if (error instanceof Error) {
           errorMessage = error.message;
         }
-        
+
         const errorResponse: Message = {
           id: (Date.now() + 1).toString(),
           content: errorMessage,
           isUser: false,
           timestamp: new Date().toLocaleTimeString(),
         };
-        
+
         setConversations((prev) =>
           prev.map((conv) =>
             conv.id === currentConversationId

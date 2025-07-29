@@ -437,7 +437,7 @@ export default function ApiDocumentation() {
                 <pre className="text-sm bg-gray-100 dark:bg-gray-900 p-3 rounded-md overflow-x-auto">
                   <code className="dark:text-gray-300">
                     {`// Example request with JWT token
-fetch('http://localhost:3000/gateway/service1', {
+fetch('${process.env.NEXT_PUBLIC_BACKEND_URL}/gateway/service1', {
   headers: {
     'Authorization': 'Bearer ${apiKey || "YOUR_JWT_TOKEN"}',
     'Content-Type': 'multipart/form-data'

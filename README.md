@@ -74,7 +74,7 @@ isdb-front/
 ### Environment Variables
 Create a `.env.local` file in the root directory:
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_BACKEND_URL=http://localhost:3000
 ```
 
 ### Setup Instructions
@@ -160,11 +160,11 @@ Body: {
 1. Push your code to GitHub
 2. Connect your repository to Vercel
 3. Set environment variables:
-   - `NEXT_PUBLIC_API_URL`
+   - `NEXT_PUBLIC_BACKEND_URL`
 4. Deploy
 
 ### Environment Variables
-- `NEXT_PUBLIC_API_URL`: Backend API URL
+- `NEXT_PUBLIC_BACKEND_URL`: Backend API URL
 
 ## Known Issues
 
