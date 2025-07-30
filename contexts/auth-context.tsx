@@ -7,10 +7,21 @@ import axios from 'axios';
 
 export interface User {
   id: string
-  name: string
-  email: string
-  method: "email" | "google" | "github"
-  createdAt: string
+  name?: string
+  username?: string
+  email?: string
+  method?: "email" | "google" | "github"
+  loginMethod?: string
+  login_method?: string
+  authMethod?: string
+  auth_method?: string
+  provider?: string
+  createdAt?: string
+  created_at?: string
+  joinedAt?: string
+  joined_at?: string
+  registeredAt?: string
+  registered_at?: string
 }
 
 interface AuthContextType {
@@ -40,7 +51,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Function to initialize user data
   const initializeUser = (userData: User) => {
-    setUser(userData);
+    // Normalize user data to ensure it has all expected properties
+    setUser({
+      id: userData.id,
+      name: userData.name || userData.username || "",
+      email: userData.email || "",
+      method: userData.method || userData.loginMethod || userData.login_method || userData.authMethod || userData.auth_method || userData.provider || "email",
+      createdAt: userData.createdAt || userData.created_at || userData.joinedAt || userData.joined_at || userData.registeredAt || userData.registered_at || new Date().toISOString()
+    });
     setLoading(false);
   }
 
@@ -55,7 +73,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           // Fetch user data
           const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/me`);
-          setUser(response.data.user);
+          const userData = response.data.user;
+
+          // Normalize user data to ensure it has all expected properties
+          setUser({
+            id: userData.id,
+            name: userData.name || userData.username || "",
+            email: userData.email || "",
+            method: userData.method || userData.loginMethod || userData.login_method || userData.authMethod || userData.auth_method || userData.provider || "email",
+            createdAt: userData.createdAt || userData.created_at || userData.joinedAt || userData.joined_at || userData.registeredAt || userData.registered_at || new Date().toISOString()
+          });
         } catch (error) {
           // If token is invalid, remove it
           Cookies.remove('token');
@@ -85,7 +112,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Set token in axios headers
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
-      setUser(userData);
+      // Normalize user data to ensure it has all expected properties
+      setUser({
+        id: userData.id,
+        name: userData.name || userData.username || "",
+        email: userData.email || "",
+        method: userData.method || userData.loginMethod || userData.login_method || userData.authMethod || userData.auth_method || userData.provider || "email",
+        createdAt: userData.createdAt || userData.created_at || userData.joinedAt || userData.joined_at || userData.registeredAt || userData.registered_at || new Date().toISOString()
+      });
     } finally {
       setLoading(false)
     }
@@ -109,7 +143,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Set token in axios headers
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
-      setUser(userData);
+      // Normalize user data to ensure it has all expected properties
+      setUser({
+        id: userData.id,
+        name: userData.name || userData.username || "",
+        email: userData.email || "",
+        method: userData.method || userData.loginMethod || userData.login_method || userData.authMethod || userData.auth_method || userData.provider || "email",
+        createdAt: userData.createdAt || userData.created_at || userData.joinedAt || userData.joined_at || userData.registeredAt || userData.registered_at || new Date().toISOString()
+      });
     } finally {
       setLoading(false)
     }
@@ -128,7 +169,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     try {
       const response = await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/profile`, data);
-      setUser(response.data.user);
+      const userData = response.data.user;
+
+      // Normalize user data to ensure it has all expected properties
+      setUser({
+        id: userData.id,
+        name: userData.name || userData.username || "",
+        email: userData.email || "",
+        method: userData.method || userData.loginMethod || userData.login_method || userData.authMethod || userData.auth_method || userData.provider || "email",
+        createdAt: userData.createdAt || userData.created_at || userData.joinedAt || userData.joined_at || userData.registeredAt || userData.registered_at || new Date().toISOString()
+      });
     } finally {
       setLoading(false)
     }

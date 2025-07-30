@@ -11,7 +11,7 @@ export default function Profile() {
   const { user, updateProfile, logout } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [isEditingPassword, setIsEditingPassword] = useState(false)
-  const [name, setName] = useState(user?.name || "")
+  const [name, setName] = useState(user?.name || user?.username || "")
   const [email, setEmail] = useState(user?.email || "")
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
@@ -20,11 +20,12 @@ export default function Profile() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
+
   // Reset form when user changes
   useEffect(() => {
     if (user) {
-      setName(user.name)
-      setEmail(user.email)
+      setName(user.name || user.username || "")
+      setEmail(user.email || "")
     }
   }, [user])
 
@@ -159,8 +160,8 @@ export default function Profile() {
                       variant="outline"
                       onClick={() => {
                         setIsEditing(false)
-                        setName(user.name)
-                        setEmail(user.email)
+                        setName(user?.name || user?.username || "")
+                        setEmail(user?.email || "")
                       }}
                     >
                       Cancel
@@ -250,7 +251,7 @@ export default function Profile() {
                         <User className="w-5 h-5 mr-2 text-primary" />
                         Name
                       </dt>
-                      <dd className="text-sm text-dark flex-1">{user.name}</dd>
+                      <dd className="text-sm text-dark flex-1">{user?.name || user?.username || "Not available"}</dd>
                     </div>
 
                     <div className="py-4 flex items-center">
@@ -258,7 +259,7 @@ export default function Profile() {
                         <Mail className="w-5 h-5 mr-2 text-primary" />
                         Email
                       </dt>
-                      <dd className="text-sm text-dark flex-1">{user.email}</dd>
+                      <dd className="text-sm text-dark flex-1">{user?.email || "Not available"}</dd>
                     </div>
 
                     <div className="py-4 flex items-center">
@@ -267,11 +268,24 @@ export default function Profile() {
                         Joined
                       </dt>
                       <dd className="text-sm text-dark flex-1">
-                        {new Date(user.createdAt).toLocaleDateString(undefined, {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
+                        {(() => {
+                          try {
+                            // Try different possible property names for the creation date
+                            const dateString = user.createdAt || user.created_at || user.joinedAt || user.joined_at || user.registeredAt || user.registered_at;
+                            if (!dateString) return "Not available";
+
+                            const date = new Date(dateString);
+                            return !isNaN(date.getTime()) 
+                              ? date.toLocaleDateString(undefined, {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })
+                              : "Not available";
+                          } catch (e) {
+                            return "Not available";
+                          }
+                        })()}
                       </dd>
                     </div>
 
@@ -281,9 +295,18 @@ export default function Profile() {
                         Login Method
                       </dt>
                       <dd className="text-sm text-dark flex-1">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-light/30 text-primary capitalize">
-                          {user.method}
-                        </span>
+                        {(() => {
+                          // Try different possible property names for the login method
+                          const method = user?.method || user?.loginMethod || user?.login_method || user?.authMethod || user?.auth_method || user?.provider;
+
+                          return method ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-light/30 text-primary capitalize">
+                              {method}
+                            </span>
+                          ) : (
+                            "Not available"
+                          );
+                        })()}
                       </dd>
                     </div>
                   </dl>
